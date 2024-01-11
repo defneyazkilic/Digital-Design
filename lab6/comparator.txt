@@ -1,0 +1,28 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_std.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+
+entity Comparator is
+    Port ( A : in std_logic_vector(7 downto 0);
+           B : in STD_LOGIC_vector (7 downto 0);
+           comp : out std_logic_vector (2 downto 0));
+end Comparator;
+
+architecture comp_bhv of Comparator is
+
+begin
+ process
+     begin
+if A=B then
+           comp <= "010";
+       elsif A>B then
+           comp <= "001";
+      elsif A<B then
+           comp <= "100";
+      end if;
+    end process;
+
+
+end comp_bhv;

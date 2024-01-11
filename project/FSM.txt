@@ -1,0 +1,167 @@
+
+
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity FSM is
+    Port (clk : in STD_LOGIC;
+         enable: in STD_LOGIC;
+         reset : in STD_LOGIC;
+         pin1 : in STD_LOGIC;
+         pin2 : in STD_LOGIC;
+         pin3 : in STD_LOGIC;
+         pin4 : in STD_LOGIC;
+         servo1 : out std_logic;
+         servo2 : out std_logic;
+         now : out STD_LOGIC_vector(2 downto 0)
+        );
+end FSM;
+
+architecture Behavioral of FSM is
+    TYPE State_type IS (A,B,C,D);
+    SIGNAL st,next_st : State_type;
+    signal servo1_rotate,servo2_rotate : std_logic_vector( 6 downto 0);
+    signal next_servo1, next_servo2: std_logic_vector( 6 downto 0);
+    signal o : std_logic_vector(2 downto 0);
+
+
+begin
+
+    enc: entity work.encoder(enc_bhv)
+        port map(pin1 => pin1, pin2=> pin2, pin3 => pin3, pin4 => pin4, output => o);
+
+    SERVO_1: entity work.servo_main(Behavioral)
+        port map(clk => clk,
+                 reset => reset,
+                 pos => next_servo1,
+                 servo => servo1);
+
+    SERVO_2: entity work.servo_main(Behavioral)
+        port map(clk => clk,
+                 reset => reset,
+                 pos => next_servo2,
+                 servo => servo2);
+
+
+    process(clk,reset)
+    begin
+        IF (reset = '1' and enable = '1') THEN
+            st <= A;
+            next_servo1 <= "0000000";
+            next_servo2 <= "0000000";
+            now <= "001";
+
+
+        ELSIF enable = '1' and(Clk = '1' AND Clk'EVENT) then
+            st <= Next_st;
+            now <= o;
+            next_servo1 <= servo1_rotate;
+            next_servo2 <= servo2_rotate;
+
+        END IF;
+    END PROCESS;
+
+
+    process (st,o)
+    begin
+        Case st Is
+
+            when A =>
+                servo1_rotate <= "0000000"; --0--
+                servo2_rotate <= "0000000"; --0--
+
+                if o = "001" then --1--
+                    next_st<= A;
+
+
+
+                elsif o = "010" then --2 --
+                    next_st<= B;
+
+
+
+                elsif o = "011"  then --3--
+                    next_st<= C;
+
+
+                elsif o = "100"  then --4--
+                    next_st<= D;
+
+
+
+                end if;
+
+            when B =>
+                servo1_rotate <= "0100000"; --90--
+                servo2_rotate <= "0000000";--0--
+
+                if o = "001"  then
+                    next_st<= A;
+                   
+
+                elsif o = "010"  then
+                    next_st<= B;
+                    
+
+                elsif o = "011"  then
+                    next_st<= C;
+                    
+
+                elsif o = "100"  then
+                    next_st<= D;
+                    
+
+                end if;
+            when c =>
+                servo1_rotate <= "0110000"; --134--
+                servo2_rotate <= "0110000"; --134--
+                if o = "001"  then
+                    next_st<= A;
+                    
+                elsif o = "010"  then
+                    next_st<= B;
+                    
+
+                elsif o = "011"  then
+                    next_st<= C;
+                    
+
+                elsif o = "100"  then
+                    next_st<= D;
+                    
+
+                end if;
+
+            when D =>
+                servo1_rotate <= "0100000"; --90--
+                servo2_rotate <= "0100000"; --90--
+                if o = "001"  then
+                    next_st<= A;
+                    
+
+                elsif o = "010"  then
+                    next_st<= B;
+                    
+
+
+                elsif o = "011"  then
+                    next_st<= C;
+                    
+
+
+                elsif o = "100"  then
+                    next_st<= D;
+                    
+
+
+
+
+                end if;
+        end case;
+    end process;
+
+
+end Behavioral;

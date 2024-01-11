@@ -1,0 +1,97 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+
+entity main_register is
+    Port ( clk : in STD_LOGIC;
+           reset : in STD_LOGIC;
+           enable : in STD_LOGIC;
+           A : in std_logic_vector ( 7 downto 0);
+           B : in STD_LOGIC_vector ( 7 downto 0);
+           GCD : out STD_LOGIC_vector ( 7 downto 0)
+           );
+end main_register;
+
+architecture reg_bhv of main_register is
+type state is (hold, replace, substract);
+ signal reg_state, following_state : state;
+ 
+ signal reg_a, reg_b, following_a, following_b:std_logic_vector(7 downto 0);
+ signal comp_a,comp_b : std_logic_vector(7 downto 0);
+ 
+ signal sub_b, sub_a, sub_out: std_logic_vector(7 downto 0);
+ signal comp_out: std_logic_vector(2 downto 0);
+
+begin
+
+
+comparison: entity work.Comparator(comp_bhv)
+ port map(A => comp_a, B=> comp_b, comp => comp_out);
+ subtractor: entity work.subtractor(sub_bhv)
+ port map(A => sub_a, B=> sub_b, result => sub_out);
+ 
+ process(clk,reset)
+ begin
+ if reset='1' then
+    reg_state <= hold;
+    reg_a <= (others=>'0');
+    reg_b <= (others=>'0');
+
+ elsif (rising_edge(clk)) then
+    reg_state <= following_state;
+    reg_a <= following_a;
+    reg_b <= following_b;
+ end if;
+ end process;
+ 
+ 
+ 
+ process(reg_state,reg_a,reg_b,enable,A,B)
+ begin
+ following_a <= reg_a;
+ following_b <= reg_b;
+ comp_a <= reg_a;
+ comp_b <= reg_b;
+ sub_a <= std_logic_vector(reg_a);
+ sub_b <= std_logic_vector(reg_b);
+ 
+ case reg_state is
+ when hold =>
+ if enable = '1' then
+ following_a <= std_logic_vector(A);
+ following_b <= std_logic_vector(B);
+ following_state <= replace;
+ else
+ following_state <= hold;
+ end if;
+ 
+ when replace =>
+ if (comp_out = "010") then
+ -- when A=B, state is hold
+ following_state <= hold;
+ else
+ -- when A is less than B, A and B change their places to be used in the unsigned subtractor state
+ if(comp_out = "100") then
+ following_a <= reg_b;
+ following_b <= reg_a;
+ end if;
+ following_state <= substract;
+ end if;
+
+when substract =>
+ following_a <= std_logic_vector(sub_out);
+ -- in order to continue to subtraction process the result 
+ --of previous subtraction is replacd with the new input of the second subtraction process
+ following_state <= replace;
+ -- returning to replace state to do  comparison with the new inputs
+ 
+ end case;
+ end process;
+ GCD <= std_logic_vector(reg_a);
+
+
+
+end reg_bhv;

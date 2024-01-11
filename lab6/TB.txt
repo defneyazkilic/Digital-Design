@@ -1,0 +1,39 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_unsigned.all;
+
+
+entity mainTB is
+end mainTB;
+
+architecture mainTB_bhv of mainTB is
+
+signal clk,reset,enable : std_logic;
+signal A, B, GCD : std_logic_vector (7 downto 0);
+
+ type state_type is (hold, replace, subtract);
+ signal reg_state, following_state : state;
+
+begin
+
+ dut: entity work.main_register(reg_bhv)
+ port map(clk,reset,enable,A,B,GCD);
+ 
+ 
+ clk_process: process begin
+ clk <= '0';
+ wait for 10ns;
+ clk <= '1';
+ wait for 10ns;
+ end process;
+ 
+ tb_process: process begin
+ enable <= '1';
+ A <= "10001100";
+ B <= "00001100";
+ reset <= '0';
+ wait for 100ns;
+ enable <= '0';
+ wait;
+ end process;
+ end mainTB_bhv;

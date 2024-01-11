@@ -1,0 +1,39 @@
+
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity Encoder is
+    Port (  
+           pin1 : in STD_LOGIC;
+           pin2 : in STD_LOGIC;
+           pin3 : in STD_LOGIC;
+           pin4 : in STD_LOGIC;
+           output : out std_logic_vector(2 downto 0));
+end Encoder;
+
+architecture enc_bhv of Encoder is
+begin
+process ( pin1,pin2,pin3,pin4)
+begin
+IF pin1 = '0' and pin2= '1'and pin3= '1'and pin4= '1' then
+output <= "001";
+elsif  pin1 = '1' and pin2= '0'and pin3= '1'and pin4= '1' then
+output <= "010";
+ELSIF pin1 = '1' and pin2= '1'and pin3= '0'and pin4= '1' then
+output <= "011";
+elsif pin1 = '1' and pin2= '1'and pin3= '1'and pin4= '0' then
+output <= "100";
+else
+output <= "000";
+
+
+
+
+end if;
+end process;
+
+
+end enc_bhv;

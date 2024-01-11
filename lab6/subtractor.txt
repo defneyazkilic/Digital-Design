@@ -1,0 +1,23 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+use IEEE.NUMERIC_STD.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+
+entity subtractor is
+Port ( A,B : in STD_LOGIC_vector ( 7 downto 0);
+       result : out std_logic_vector (7 DOWNTO 0));
+
+
+end subtractor;
+
+architecture sub_bhv of subtractor is
+
+begin
+    result <= A-B;
+
+
+end sub_bhv;

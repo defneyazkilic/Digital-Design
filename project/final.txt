@@ -1,0 +1,230 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 12/12/2022 08:26:19 AM
+-- Design Name: 
+-- Module Name: FSM - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity FSM is
+ Port (clk : in STD_LOGIC;
+           reset : in STD_LOGIC;
+           pin1 : in STD_LOGIC;
+           pin2 : in STD_LOGIC;
+           pin3 : in STD_LOGIC;
+           pin4 : in STD_LOGIC;
+           next_pre : out STD_LOGIC_vector (2 downto 0);
+           now : out STD_LOGIC_vector(2 downto 0));
+end FSM;
+
+architecture Behavioral of FSM is
+TYPE State_type IS (H,A,B,C,D);
+SIGNAL st,next_st : State_type;
+SIGNAL pre : std_logic_vector (2 downto 0);
+signal o : std_logic_vector(2 downto 0);
+
+
+begin
+enc: entity work.encoder(enc_bhv)
+port map(pin1 => pin1, pin2=> pin2, pin3 => pin3, pin4 => pin4, output => o);
+process(clk,reset)
+begin
+IF (reset = '1') THEN
+      st <= A;
+      pre<= "001";
+      
+    ELSIF (Clk = '1' AND Clk'EVENT) THEN
+      st <= Next_st;
+      now <= o;
+     next_pre <= pre;
+    END IF;
+  END PROCESS;
+
+
+process (st,o,pre)
+begin
+
+Case st Is
+    
+when A =>
+    pre <= "001";
+    
+    if o = "001" and pre = "001" then
+    next_st<= A;
+    
+    
+    elsif o = "010" and pre = "001" then
+    next_st<= B;
+    
+   
+    elsif o = "011" and pre = "001" then
+    next_st<= C;
+    
+   
+    elsif o = "100" and pre = "001" then
+    next_st<= D;
+    
+    
+    elsif o = "000" and pre = "001" then
+    next_st<= H;
+    
+   
+    end if;
+    
+when B =>
+    pre  <= "010";
+    if o = "001" and pre = "010" then
+    next_st<= A;
+    
+    
+    elsif o = "010" and pre = "010" then
+    next_st<= B;
+    
+    next_pre <= pre;
+    elsif o = "011" and pre = "010" then
+    next_st<= C;
+    
+    next_pre <= pre;
+    elsif o = "100" and pre = "010" then
+    next_st<= D;
+    elsif o = "000" and pre = "010" then
+    next_st<= H;
+    
+    end if;
+when c =>
+pre  <= "011";
+    if o = "001" and pre = "011" then
+    next_st<= A;
+    elsif o = "010" and pre = "011" then
+    next_st<= B;
+    
+    next_pre <= pre;
+    elsif o = "011" and pre = "011" then
+    next_st<= C;
+    
+    next_pre <= pre;
+    elsif o = "100" and pre = "011" then
+    next_st<= D;
+    elsif o = "000" and pre = "011" then
+    next_st<= H;
+    
+    end if;
+
+when D =>
+ pre  <= "100";
+    if o = "001" and pre = "100" then
+    next_st<= A;
+    elsif o = "010" and pre = "100" then
+    next_st<= B;
+    
+    next_pre <= pre;
+    elsif o = "011" and pre = "100" then
+    next_st<= C;
+    
+    next_pre <= pre;
+    elsif o = "100" and pre = "100" then
+    next_st<= D;
+    elsif o = "000" and pre = "100" then
+    next_st<= H;
+    
+    end if;
+when H =>
+ 
+    if o = "001" and pre = "001" then
+    next_st<= A;
+    pre<= "001";
+    elsif o = "001" and pre = "010" then
+    next_st<= A;
+    pre<= "010";
+    elsif o = "001" and pre = "011" then
+    next_st<= A;
+   pre<= "011";
+    elsif o = "001" and pre = "100" then
+    next_st<= A;
+    pre<= "100";
+    
+    elsif o = "010" and pre = "001" then
+    next_st<= B;
+    pre <= "001";
+    elsif o = "010" and pre = "010" then
+    next_st<= B;
+    pre <= "010";
+    elsif o = "010" and pre = "011" then
+    next_st<= B;
+    pre <= "011";
+    elsif o = "010" and pre = "100" then
+    next_st<= B;
+    pre <= "001";
+    
+    elsif o = "011" and pre = "001" then
+    next_st<= C;
+    pre<= "001";
+    elsif o = "011" and pre = "010" then
+    next_st<= C;
+    pre<= "010";
+    elsif o = "011" and pre = "011" then
+    next_st<= C;
+    pre<= "011";
+    elsif o = "011" and pre = "100" then
+    next_st<= C;
+    pre<= "100";
+    
+    
+    elsif o = "100" and pre = "001" then
+    next_st<= D;
+    pre<= "001";
+    elsif o = "100" and pre = "010" then
+    next_st<= D;
+    pre<= "010";
+    elsif o = "100" and pre = "011" then
+    next_st<= D;
+    pre<= "011";
+    elsif o = "100" and pre = "100" then
+    next_st<= D;
+    pre<= "100";
+    
+    
+    
+    elsif o = "000" and pre = "001" then
+    next_st<= H;
+    pre <= "001";
+    elsif o = "000" and pre = "010" then
+    next_st<= H;
+    pre <= "010";
+    elsif o = "000" and pre = "011" then
+    next_st<= H;
+    pre <= "011";
+    elsif o = "000" and pre = "100" then
+    next_st<= H;
+    pre <= "100";
+    
+    end if;
+end case;
+end process;
+
+end Behavioral;
